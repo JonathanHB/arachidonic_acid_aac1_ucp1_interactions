@@ -1,0 +1,34 @@
+#Jonathan Borowsky
+#Grabe lab
+#9/20/25
+
+#steps for calculating electric fields with vmd pmepot
+
+in /home/jonathan/Documents/grabelab/aac1-ucp1/paper-01/electric_potential/092025/aac1/charge_addition
+
+1. copied files for convenience (needed for pqr generation):
+cp -r /home/jonathan/Documents/grabelab/aac1-ucp1/long-aac1-ucp1/long-aac1-ucp1-processing/wynton/aac1/input/topol.top .
+cp -r /home/jonathan/Documents/grabelab/aac1-ucp1/long-aac1-ucp1/long-aac1-ucp1-processing/wynton/aac1/input/toppar .
+
+2. convert gmx to pdb with the same numbering:
+gmx trjconv -f /home/jonathan/Documents/grabelab/aac1-ucp1/long-aac1-ucp1/long-aac1-ucp1-processing/wynton/aac1/input/seg_0035.gro -s /home/jonathan/Documents/grabelab/aac1-ucp1/long-aac1-ucp1/long-aac1-ucp1-processing/wynton/aac1/input/aac1_500ns_notrr.tpr -o seg_0035_gro_order.pdb
+
+3. edit terminal protein residue names so the pqr file script can distinguish them
+cp seg_0035_gro_order.pdb seg_0035_gro_order_term_resns.pdb
+in both seg_0035_gro_order_term_resns.pdb and toppar/PROA.itp:
+- rename serine 1 from SER to SEn
+- rename valine 297 C from VAL to VAc
+
+4. make pqr file using pdb coordinates and charges in itp files in toppar 
+python3 ../../add_charges_to_pdb_save_pqr.py -t topol.top -p seg_0035_gro_order_term_resns.pdb -o seg_0035.pqr
+rename SEn and VAc back if necessary
+
+5. make .xtc files with only water wire frames
+x01:/media/X01Raid01/Data_Backup/home/jborowsky/long-sims/paper-01/water-wires-and-permeation/get_wire_frames.py
+
+6. analysis in vmd
+in VMD tkconsole:
+source /home/jonathan/Documents/grabelab/aac1-ucp1/paper-01/electric_potential/092025/vmd_pmepot_[protein]_[run].tcl
+
+7. process results with a derivative of ../../../potential_analysis.ipynb
+
