@@ -12,7 +12,7 @@ import mdtraj as md
 def pdb_loader(input_fn, output_fn, atoms, bfactors):
 
     #format: [[index, atom number, atom name, x, y, z, whether the atom is hydrogen],...]
-
+    #print(atoms)
     x = 0
     with open(output_fn, "w") as fo:    
         with open(input_fn, "r") as fi:
@@ -20,7 +20,7 @@ def pdb_loader(input_fn, output_fn, atoms, bfactors):
                 if line[0:4] == "ATOM":
 
                     atomstring = line[17:20].strip() + str(int(line[22:26].strip())) + "-" + line[12:16].strip()
-                    
+                    #print(atomstring)    
                     if line[17:20].strip() == "HSD":
                         atomstring = "HIS" + str(int(line[22:26].strip())) +"-"+ line[12:16].strip()
                     elif line[17:20].strip() == "ILE" and line[12:16].strip() == "CD":
@@ -91,7 +91,7 @@ def contact_freq_byresi(contacts_by_atom, binding_events, atoms_by_residue, gro_
     #####################################################################################################
 
     #loop over binding sites
-    for si in range(7):
+    for si in range(6):
 
         #contact frequency by residue for AA bound at current site
         freqs_by_residue = []
@@ -101,13 +101,18 @@ def contact_freq_byresi(contacts_by_atom, binding_events, atoms_by_residue, gro_
             n_contacts = 0
             #loop over atoms in residue
             for a in abr:
-                n_contacts += np.sum(np.multiply(contacts_by_atom[:,:,a], binding_events[si]))
+                n_contacts += np.sum(np.multiply(contacts_by_atom[a], binding_events[si]))
 
             #copilot suggested this normalization factor and I have to say it's better than what I had in mind
-            freqs_by_residue += [n_contacts / np.sum(binding_events[si]) for _ in abr]
+            #freqs_by_residue.append(n_contacts / np.sum(binding_events[si])) 
+            freqs_by_residue += [n_contacts / np.sum(binding_events[si]) if np.sum(binding_events[si]) > 0 else 0 for _ in abr]
 
-        save_pdb_bfactors(gro_path, pdb_path, output_path, freqs_by_residue, atom_query, suffix=f"-{protein}-site-{si}")
-
+        if max(freqs_by_residue) > 0:
+        
+            #print(freqs_by_residue)
+            save_pdb_bfactors(gro_path, pdb_path, output_path, freqs_by_residue, atom_query, suffix=f"bound-contacts-{protein}-site-{si}")
+        else:
+            print(f"no contacts for site {si}")
 
 #1. load protein nonhydrogen atoms and get indices of atoms in each helix
 #2. load contacts
@@ -191,7 +196,10 @@ def identify_bound_states(ibs):
                     #everything can be done in here I believe; it should probably be its own function
                     if os.path.exists(file_contacts):
                         #contacts: [n_upperleaflet_aa x n_frames x n_protein_heavy_atoms] array of 0s and 1s 
+                        #after transposition: contacts: [n_protein_heavy_atoms x n_upperleaflet_aa x n_frames] array of 0s and 1s 
+                        
                         contacts = np.load(file_contacts).astype("uint8").transpose(2,0,1)
+                        print(contacts.shape)
                         contacts_all.append(contacts)
                         #contacts.transpose(2,0,1)
                         #planes: [n_helices+1 x n_upperleaflet_aa x n_frames] 
@@ -205,17 +213,17 @@ def identify_bound_states(ibs):
                         
                 # print(len(planes_all))
                 planes_all = np.concatenate(planes_all, axis=2)
-                contacts_all = np.concatenate(contacts_all, axis=1)
+                contacts_all = np.concatenate(contacts_all, axis=2)
                 contacts_byhelix_all = np.concatenate(contacts_byhelix_all, axis=2)
                 contacts_planes_all = np.concatenate(contacts_planes_all, axis=2)
                 
                 contacts_all_all.append(contacts_all.astype("uint8"))
                 contacts_planes_all_all.append(contacts_planes_all.astype("uint8"))
 
-                print(planes_all.shape)
-                print(contacts_all.shape)
-                print(contacts_byhelix_all.shape)
-                print(contacts_planes_all.shape)
+                #print(planes_all.shape)
+                #print(contacts_all.shape)
+                #print(contacts_byhelix_all.shape)
+                #print(contacts_planes_all.shape)
 
 
                 colors = ["purple", "blue", "cyan", "green", "orange", "red", "magenta", "grey"]
@@ -249,20 +257,22 @@ def identify_bound_states(ibs):
 
                 rn += 1
                 #sys.exit(0)
+                #break
 
         #########################################################################################################
         #----------------------------------------for revisions figure--------------------------------------------
 
-        contacts_all_all = np.concatenate(contacts_all_all, axis=1)
+        contacts_all_all = np.concatenate(contacts_all_all, axis=2)
         contacts_planes_all_all = np.concatenate(contacts_planes_all_all, axis=2)
 
         helixresis_all = "or".join(rq)
         protein_query = f"protein and ({helixresis_all}) and not element H"
         
-        pdb_path = md.load(f"{toppath_upper}/{servers[0]}/{protein}/input/seg_0035.pdb")
+        gro_path = f"{toppath_upper}/{servers[0]}/{protein}/input/seg_0035.gro"
+        pdb_path = f"{toppath_upper}/{servers[0]}/{protein}/input/seg_0035.pdb"
         output_path = f"{inputpath_main}/contact_freq_heatmaps"
 
-        contact_freq_byresi(contacts_all_all, contacts_planes_all_all, atoms_by_residue, ref_trj, pdb_path, output_path, protein_query, protein)
+        contact_freq_byresi(contacts_all_all, contacts_planes_all_all, atoms_by_residue, gro_path, pdb_path, output_path, protein_query, protein)
 
 
 def _identify_bound_states(contacts, planes, helix_inds):
