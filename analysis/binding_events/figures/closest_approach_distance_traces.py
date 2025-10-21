@@ -126,20 +126,37 @@ def compile_distance_data(residue, leaflet):
 	
             colors = ["blue", "orange", "green", "red", "purple", "yellow"]
 
+            plt.rcParams.update({'font.size': 15})
+            # creating a dictionary
+            font = {'size': 15}
+            # using rc function
+            plt.rc('font', **font)
+
             plt.figure()
 
             for ci, data in enumerate(dist_traces[site]):
                 plt.plot(data[0], data[2], linewidth = 0.5, alpha = 0.25, color = colors[ci], label="_nolegend_")
                 plt.plot(data[0], data[1], color = colors[ci], label = f"line{ci}")
 
+
+            #plt.rcParams.update({'font.size': 15})
+            # creating a dictionary
+            #font = {'size': 15}
+            # using rc function
+            #plt.rc('font', **font)
+
             #plt.title(f"{protein} {site}")
-            plt.xlabel("time (microseconds)")
-            plt.ylabel(f"AA COO- distance to protein center of mass (nm)")
-            plt.legend(dist_legends[site])
+            plt.xlabel(r"time ($\mu$s)")
+            plt.ylabel(f"AA COO- distance to protein\ncenter of mass (nm)")
+            if protein == "aac1" and site == "h56":
+                plt.legend(dist_legends[site], loc="upper right")
+            else:
+                plt.legend(dist_legends[site])
+
             plt.ylim(0,3)
             plt.xlim(0,7.5)
-            svg_path = f"/media/X01Raid01/Data_Backup/home/jborowsky/long-sims/long-aac1-ucp1-processing/closest_approaches/closest_approaches_{protein}_{residue}_{leaflet}_{site}.svg"
-            plt.savefig(svg_path, format='svg')
+            svg_path = f"/media/X01Raid01/Data_Backup/home/jborowsky/long-sims/long-aac1-ucp1-processing/closest_approaches/svgs_2/closest_approaches_{protein}_{residue}_{leaflet}_{site}_v2.svg"
+            plt.savefig(svg_path, format='svg', bbox_inches="tight")
             #png_path = f"/media/X01Raid01/Data_Backup/home/jborowsky/long-sims/long-aac1-ucp1-processing/closest_approaches/closest_approaches_{protein}_{residue}_{leaflet}_{site}.png"
             #plt.savefig(png_path, dpi = 600)
             plt.clf()
@@ -199,4 +216,4 @@ def compile_distance_data(residue, leaflet):
 
 # for leaflet in ["upper", "lower"]:
 #     for residue in ["ARAN", "POPC"]:
-compile_distance_data("POPC", "upper")
+compile_distance_data("ARAN", "upper")
