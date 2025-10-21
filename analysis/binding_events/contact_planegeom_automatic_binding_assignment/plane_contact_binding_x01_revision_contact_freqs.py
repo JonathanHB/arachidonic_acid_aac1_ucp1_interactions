@@ -104,7 +104,7 @@ def contact_freq_byresi(contacts_by_atom, binding_events, atoms_by_residue, gro_
                 n_contacts += np.sum(np.multiply(contacts_by_atom[:,:,a], binding_events[si]))
 
             #copilot suggested this normalization factor and I have to say it's better than what I had in mind
-            freqs_by_residue.append(n_contacts / np.sum(binding_events[si])) 
+            freqs_by_residue += [n_contacts / np.sum(binding_events[si]) for _ in abr]
 
         save_pdb_bfactors(gro_path, pdb_path, output_path, freqs_by_residue, atom_query, suffix=f"-{protein}-site-{si}")
 
