@@ -1,1 +1,8 @@
 Note that the equilibration .mdp files are the same for both proteins except for the comments in their headers
+
+Files to include:
+- starting structures
+- charmmgui files
+- equilibration and production mdp files
+- equilibrated structures and topologies
+

@@ -1,0 +1,8 @@
+ You clicked /step2.1_pore/PWAT//TIP3`2/OH2
+ Selector: selection "sele" defined with 3 atoms.
+ You clicked /step2.1_pore/PWAT//TIP3`3/OH2
+ Selector: selection "sele" defined with 6 atoms.
+ You clicked /step2.1_pore/PWAT//TIP3`36/OH2
+ Selector: selection "sele" defined with 9 atoms.
+ You clicked /step2.1_pore/PWAT//TIP3`7/OH2
+ Selector: selection "sele" defined with 12 atoms.
