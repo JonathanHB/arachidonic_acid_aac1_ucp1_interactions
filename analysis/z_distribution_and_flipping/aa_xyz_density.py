@@ -15,7 +15,7 @@ import compute_observable_on_trjs_x01_v3
 
 def aa_xyz(trj_path, top_path, protein, savefilename):
 
-    upperpath = "/media/X01Raid01/Data_Backup/home/jborowsky/long-sims/long-aac1-ucp1-processing/aa_z_dist_2/"
+    upperpath = "/media/X01Raid01/Data_Backup/home/jborowsky/long-sims/long-aac1-ucp1-processing/aa_xyz_dist/"
     _savefilename = upperpath + savefilename
 
     print(f"trajectory = {trj_path}")
@@ -33,7 +33,7 @@ def aa_xyz(trj_path, top_path, protein, savefilename):
 
     aa_inds = trj.top.select("resname ARAN and name C1")
     print(aa_inds)
-    np.save(_savefilename+"-aaxyz" + ".npy", trj.xyz[:,aa_inds]-np.tile(prot_com, (16,1)).transpose())
+    np.save(_savefilename+"-aaxyz" + ".npy", trj.xyz[:,aa_inds]-np.tile(prot_com, (16,1,1)).transpose(1,0,2))
 
 
 
