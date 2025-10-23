@@ -1,0 +1,61 @@
+; This gromacs .mdp file was generated
+; as /wynton/home/grabe/jborowsky/aac1/auto-gmx-equil-2/run21/seg_32_NPT_13.mdp
+; by /wynton/home/grabe/jborowsky/aac1/auto-gmx-equil-2/scripts/make-topology-restraint-mdp.py
+; on 2025-01-22 15:33:49.966407
+
+; input handling
+gen-vel                  = no
+continuation             = yes
+
+; integration
+integrator               = md
+dt                       = 0.002
+nsteps                   = 1000000
+tinit                    = 52400.0
+
+; bonded interactions
+constraints              = h-bonds
+constraint-algorithm     = lincs
+lincs-order              = 4
+lincs-iter               = 1
+
+; neighbor searching
+cutoff-scheme            = Verlet
+nstlist                  = 20
+pbc                      = xyz
+
+; electrostatics
+coulombtype              = PME
+pme-order                = 4
+fourierspacing           = 0.12
+rcoulomb                 = 1.2
+
+; Van der Waals
+vdwtype                  = cut-off
+vdw-modifier             = force-switch
+rvdw-switch              = 1
+rvdw                     = 1.2
+
+; center of mass motion removal
+comm-mode                = linear
+
+; thermostat
+tcoupl                   = v-rescale
+tc_grps                  = System
+tau-t                    = 1
+ref-t                    = 310.15
+
+; barostat
+pcoupl                   = c-rescale
+pcoupltype               = semiisotropic
+tau-p                    = 5
+ref-p                    = 1.01325 1.01325
+compressibility          = 4.5e-05 4.5e-05
+refcoord-scaling         = com
+
+; output control; frequencies in steps
+nstxout                  = 5000
+nstvout                  = 5000
+nstlog                   = 5000
+nstenergy                = 5000
+nstxout-compressed       = 5000
