@@ -1,2 +1,3 @@
-Note that the equilibration .mdp files are the same for both proteins except for the comments in their headers
+The same .mdp files were used for production md for both AAC1 and UCP1.
+Note that the equilibration .mdp files are the same for both proteins except for the comments in their headers.
 
