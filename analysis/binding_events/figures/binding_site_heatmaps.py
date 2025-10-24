@@ -36,7 +36,7 @@ def helix_resqueries(protein):
 
     return resqueries
 
-upperpath = f"/home/jonathan/Documents/grabelab/aac1-ucp1/long-aac1-ucp1/contact_freq_heatmaps"
+upperpath = f"/home/jonathan/Documents/grabelab/aac1-ucp1/long-aac1-ucp1/contact_freq_heatmaps_v2"
 
 proteins = ["ucp1", "aac1"]
 
@@ -53,7 +53,7 @@ for protein in proteins:
             cmd.load(fpath, f"{protein}-site-{si}")
             cmd.hide("everything", f"{protein}-site-{si}")
             cmd.show("cart", f"{protein}-site-{si}")
-            cmd.spectrum("b", "blue_red")
+            cmd.spectrum("b", "blue_red", minimum = 0, maximum = 1)
             cmd.show("sticks", f"resi {rq[si]} and poly and not elem H")
             cmd.show("sticks", f"resi {rq[((si+1)%6)]} and poly and not elem H")
 
@@ -136,10 +136,10 @@ for protein in proteins:
                     
             #this print statement may be important for getting the file to save due to some bug where pymol doesn't wait correctly
             print(f"{upperpath}/bound-contacts-{protein}-site-{si}-heatmap.png")
-            cmd.png(f"{upperpath}/bound-contacts-{protein}-site-{si}-heatmap.png", ray = 1)
+            cmd.png(f"{upperpath}/pngs/bound-contacts-{protein}-site-{si}-heatmap-v2.png", ray = 1)
 
 
 #color bar
 cmd.delete("all")
 cmd.ramp_new("colorbar", "none", [0,1], ["blue", "red"])
-cmd.png(f"{upperpath}/bound-contacts-colorbar.png", ray = 1)
+cmd.png(f"{upperpath}/pngs/bound-contacts-colorbar.png", ray = 1)
