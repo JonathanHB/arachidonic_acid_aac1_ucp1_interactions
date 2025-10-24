@@ -96,23 +96,48 @@ def contact_freq_byresi(contacts_by_atom, binding_events, atoms_by_residue, gro_
         #contact frequency by residue for AA bound at current site
         freqs_by_residue = []
 
+        frames_bound = np.sum(np.max(binding_events[si], axis = 0))
+        
+        if frames_bound == 0:
+            print(f"no contacts for site {si}")
+            continue
+        #print(binding_events[si].shape)
+        #print(frames_bound)
+        #print("-----------------------------------------------------")
+
         #loop over residues
         for abr in atoms_by_residue:
-            n_contacts = 0
+            contacts = []
+            #n_contacts = 0
             #loop over atoms in residue
             for a in abr:
-                n_contacts += np.sum(np.multiply(contacts_by_atom[a], binding_events[si]))
+                #n_contacts += np.sum(np.multiply(contacts_by_atom[a], binding_events[si]))
+                #multiply to create an array describing whether each AA that is bound at site si contacts the current atom at each timestep
+                #take the maximum along axis = 0 to find whether any AA that is bound at site si contacts the current atom at each timestep
+                contacts.append(np.max(np.multiply(contacts_by_atom[a], binding_events[si]), axis = 0))
 
+            #print(contacts[0].shape)
+            contacts = np.stack(contacts)
+            #print(contacts.shape)
+            #take the maximum to find whether any AA bound at site si contacts any atom of the current residue at each timestep
+            bin_contacts = np.max(contacts, axis = 0)
+            #print(bin_contacts.shape)            
+
+            #print("-==============================================================")
+
+            freqs_by_residue += [sum(bin_contacts) / frames_bound for _ in abr]
+            
             #copilot suggested this normalization factor and I have to say it's better than what I had in mind
             #freqs_by_residue.append(n_contacts / np.sum(binding_events[si])) 
-            freqs_by_residue += [n_contacts / np.sum(binding_events[si]) if np.sum(binding_events[si]) > 0 else 0 for _ in abr]
+            #freqs_by_residue += [n_contacts / np.sum(binding_events[si]) if np.sum(binding_events[si]) > 0 else 0 for _ in abr]
 
-        if max(freqs_by_residue) > 0:
+        #if max(freqs_by_residue) > 0:
         
             #print(freqs_by_residue)
-            save_pdb_bfactors(gro_path, pdb_path, output_path, freqs_by_residue, atom_query, suffix=f"bound-contacts-{protein}-site-{si}")
-        else:
-            print(f"no contacts for site {si}")
+        print(max(freqs_by_residue))
+        save_pdb_bfactors(gro_path, pdb_path, output_path, freqs_by_residue, atom_query, suffix=f"bound-contacts-{protein}-site-{si}")
+        #else:
+        #    print(f"no contacts for site {si}")
 
 #1. load protein nonhydrogen atoms and get indices of atoms in each helix
 #2. load contacts
@@ -225,6 +250,8 @@ def identify_bound_states(ibs):
                 #print(contacts_byhelix_all.shape)
                 #print(contacts_planes_all.shape)
 
+                continue
+
 
                 colors = ["purple", "blue", "cyan", "green", "orange", "red", "magenta", "grey"]
                 legend = ["1", "2", "3", "4", "5", "6", "7", "8"]
@@ -270,7 +297,7 @@ def identify_bound_states(ibs):
         
         gro_path = f"{toppath_upper}/{servers[0]}/{protein}/input/seg_0035.gro"
         pdb_path = f"{toppath_upper}/{servers[0]}/{protein}/input/seg_0035.pdb"
-        output_path = f"{inputpath_main}/contact_freq_heatmaps"
+        output_path = f"{inputpath_main}/contact_freq_heatmaps_v2"
 
         contact_freq_byresi(contacts_all_all, contacts_planes_all_all, atoms_by_residue, gro_path, pdb_path, output_path, protein_query, protein)
 
